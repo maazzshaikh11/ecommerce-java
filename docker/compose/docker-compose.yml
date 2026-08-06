@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ../../src/backend
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - JWT_SIGNING_KEY=${JWT_SIGNING_KEY:-bXlzZWNyZXRrZXltdXN0YmVleGFjdGx5MzJieXRlc2xvbmc=}
+      - DB_HOST=db
+      - DB_USER=sa
+      - DB_PASSWORD=YourStrong@Passw0rd
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - ecommerce
+
+  spa:
+    build:
+      context: ../../src/frontend/spa
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    networks:
+      - ecommerce
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'YourStrong@Passw0rd' -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ecommerce
+
+networks:
+  ecommerce:
+    driver: bridge

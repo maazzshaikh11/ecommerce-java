@@ -2,32 +2,35 @@
 	restore init \
 	build build-backend build-frontend \
 	test test-backend test-frontend test-e2e \
-	lint format verify \
+	lint verify \
 	docker-up docker-down \
 	clean
 
+MVN := mvn
+NODE := npm
+
 help: ## Show available commands
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS=":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # ------------------------
 # Restore Dependencies
 # ------------------------
 
 restore: ## Restore backend and frontend dependencies
-	cd src/backend && dotnet restore Ecommerce.sln
-	cd src/frontend/spa && npm ci
+	cd src/backend && $(MVN) dependency:resolve -B
+	cd src/frontend/spa && $(NODE) ci
 
 # ------------------------
 # Build
 # ------------------------
 
-build: build-backend build-frontend ## Build entire solution
+build: build-backend build-frontend ## Build entire project
 
-build-backend: ## Build .NET backend
-	cd src/backend && dotnet build Ecommerce.sln --no-restore
+build-backend: ## Build Java Spring Boot backend
+	cd src/backend && $(MVN) clean package -DskipTests -B
 
 build-frontend: ## Build Vue frontend
-	cd src/frontend/spa && npm run build
+	cd src/frontend/spa && $(NODE) run build
 
 # ------------------------
 # Testing
@@ -35,11 +38,11 @@ build-frontend: ## Build Vue frontend
 
 test: test-backend test-frontend ## Run backend and frontend tests
 
-test-backend: ## Run .NET tests
-	cd src/backend && dotnet test Ecommerce.sln --no-build
+test-backend: ## Run Java Spring Boot tests
+	cd src/backend && $(MVN) test -B
 
 test-frontend: ## Run Vue unit tests
-	cd src/frontend/spa && npx vitest run
+	cd src/frontend/spa && $(NODE) run test:unit -- --run
 
 test-e2e: ## Run Playwright end-to-end tests
 	cd tests/e2e && npx playwright test
@@ -51,13 +54,9 @@ test-e2e: ## Run Playwright end-to-end tests
 lint: ## Type check frontend
 	cd src/frontend/spa && npx vue-tsc --noEmit
 
-format: ## Verify .NET formatting
-	cd src/backend && dotnet format Ecommerce.sln --verify-no-changes
-
 verify: ## Run full verification (same as CI)
-	cd src/backend && dotnet build Ecommerce.sln
-	cd src/backend && dotnet test Ecommerce.sln
-	cd src/frontend/spa && npm run build
+	cd src/backend && $(MVN) clean package -B
+	cd src/frontend/spa && $(NODE) run build
 	cd src/frontend/spa && npx vitest run
 	cd tests/e2e && npx playwright test
 
@@ -76,7 +75,8 @@ docker-down: ## Stop application stack
 # ------------------------
 
 clean: ## Remove build artifacts
-	cd src/backend && dotnet clean Ecommerce.sln
+	cd src/backend && $(MVN) clean -B
+	cd src/frontend/spa && rm -rf dist
 
 init: restore ## Initialize the project
 	@echo "Project initialized successfully."

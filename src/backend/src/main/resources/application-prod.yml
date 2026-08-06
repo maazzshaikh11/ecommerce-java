@@ -1,0 +1,26 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    url: jdbc:sqlserver://${DB_HOST:localhost};databaseName=LegacyEcommerceDb;encrypt=true;trustServerCertificate=true;user=${DB_USER:sa};password=${DB_PASSWORD:YourStrong@Passw0rd}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+jwt:
+  signing-key: ${JWT_SIGNING_KEY:bXlzZWNyZXRrZXltdXN0YmVleWFjdGx5MzJieXRlc2xvbmc=}

@@ -4,34 +4,44 @@
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| .NET SDK | 10.0.302+ | Backend API, tests |
+| JDK | 21+ | Spring Boot backend, tests |
+| Maven | 3.9+ | Java build, dependency resolution |
 | Node.js | 22+ | Frontend SPA, E2E tests |
 | npm | 10+ | Package management |
-| SQL Server LocalDB | — | Database (included with Visual Studio / .NET SDK) |
+| Docker | — | SQL Server, containerized deployment |
 | Git | 2.x | Version control |
 
 ## Step 1: Clone
 
 ```bash
 git clone <repository-url>
-cd ecommerce-migration
+cd ecommerce
 ```
 
-## Step 2: Database
-
-The application uses SQL Server LocalDB with an existing `LegacyEcommerceDb` database. If the database does not exist:
+## Step 2: Database (SQL Server via Docker)
 
 ```bash
-# Create the database and seed data
-./scripts/setup.sh       # Linux/macOS
-.\scripts\setup.ps1       # Windows PowerShell
+# Start SQL Server container
+docker run -d --name sqlserver \
+  -e "ACCEPT_EULA=Y" \
+  -e "MSSQL_SA_PASSWORD=YourStrong@Passw0rd" \
+  -p 1433:1433 \
+  mcr.microsoft.com/mssql/server:2022-latest
+
+# Create the database
+docker exec -i sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -C \
+  -d master -Q "CREATE DATABASE LegacyEcommerceDb"
+
+# Apply the baseline schema
+docker exec -i sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -C \
+  -d LegacyEcommerceDb -i src/backend/src/main/resources/db/migration/V1__baseline.sql
 ```
 
-The connection string is in `src/backend/Ecommerce.Api/appsettings.json`:
-```json
-"ConnectionStrings": {
-  "LegacyEcommerceDb": "Server=(localdb)\\MSSQLLocalDB;Database=LegacyEcommerceDb;Trusted_Connection=True;TrustServerCertificate=True;"
-}
+The connection string is in `src/backend/src/main/resources/application.yml`:
+```yaml
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost;databaseName=LegacyEcommerceDb;encrypt=true;trustServerCertificate=true;user=sa;password=YourStrong@Passw0rd
 ```
 
 ## Step 3: Backend
@@ -39,14 +49,11 @@ The connection string is in `src/backend/Ecommerce.Api/appsettings.json`:
 ```bash
 cd src/backend
 
-# Restore packages
-dotnet restore Ecommerce.sln
-
 # Build
-dotnet build Ecommerce.Api/Ecommerce.Api.csproj
+mvn clean package -B
 
 # Run the API (port 5001)
-dotnet run --project Ecommerce.Api/Ecommerce.Api.csproj
+mvn spring-boot:run
 ```
 
 Verify: `GET http://localhost:5001/api/health` returns `200 OK`.
@@ -59,24 +66,20 @@ cd src/frontend/spa
 # Install dependencies
 npm install
 
-# Start dev server (port 5173 or 5002)
+# Start dev server (port 5174)
 npm run dev
 ```
 
-Verify: `http://localhost:5173` loads the SPA.
-
-## Step 5: YARP Proxy (Optional)
-
-The YARP reverse proxy is part of the API project. When the API runs on port 5001, YARP is available on the same process. It routes SPA paths to `http://localhost:5002`.
-
-> **Note:** In development, you can access the SPA directly on port 5173 (Vite) without going through YARP. YARP is primarily for production-like testing.
+Verify: `http://localhost:5174` loads the SPA.
 
 ## Environment Variables
 
 | Variable | Location | Default | Purpose |
 |----------|----------|---------|---------|
-| `JwtSigningKey` | `appsettings.json` | (dev key) | JWT signing key (≥32 bytes) |
-| `ConnectionStrings:LegacyEcommerceDb` | `appsettings.json` | LocalDB | SQL Server connection |
+| `jwt.signing-key` | `application.yml` | (dev key) | JWT signing key (≥32 bytes, base64) |
+| `DB_HOST` | env | `localhost` | SQL Server hostname (Docker: `db`) |
+| `DB_USER` | env | `sa` | SQL Server username |
+| `DB_PASSWORD` | env | `YourStrong@Passw0rd` | SQL Server password |
 | `VITE_API_BASE_URL` | `.env.development` | `http://localhost:5001/api` | API base URL for SPA |
 
 > **Warning:** Never use the development JWT signing key in production. Generate a new key with at least 32 bytes of entropy.
@@ -86,31 +89,36 @@ The YARP reverse proxy is part of the API project. When the API runs on port 500
 ```bash
 # Backend tests
 cd src/backend
-dotnet test Ecommerce.Api.Tests/Ecommerce.Api.Tests.csproj
-dotnet test Ecommerce.Api.Core.Tests/Ecommerce.Api.Core.Tests.csproj
+mvn test
 
 # Frontend tests
 cd src/frontend/spa
 npm run build   # includes type check via vue-tsc
 npx vitest run  # unit tests
+
+# E2E tests
+cd tests/e2e
+npx playwright test
 ```
 
 ## Troubleshooting
 
 ### Database Connection Failed
-- Ensure LocalDB is running: `sqllocaldb start MSSQLLocalDB`
-- Check connection string matches your LocalDB instance
+- Ensure the Docker container is running: `docker ps | grep sqlserver`
+- Check connection string in `application.yml` matches your SQL Server instance
+- Verify port 1433 is not in use: `lsof -i :1433`
 
 ### Port Already in Use
-- API default: 5001, SPA default: 5173, YARP: 5003
-- Change in `Properties/launchSettings.json` (API) or `vite.config.ts` (SPA)
+- API default: 5001, SPA default: 5174
+- Change port in `application.yml` (API) or `vite.config.ts` (SPA)
 
 ### JWT Validation Failed
-- Ensure `JwtSigningKey` in `appsettings.json` is at least 32 bytes
+- Ensure `jwt.signing-key` in `application.yml` is at least 32 bytes (base64-encoded)
 - Check that the SPA's `api/client.ts` reads from `localStorage['jwt']`
 
 ## Related
 
+- [Spring Boot Setup](spring-setup.md)
 - [Architecture — Deployment Model](../architecture/deployment-model.md)
 - [API Endpoint Catalog](../api/endpoint-catalog.md)
 - [Runbook — Database Seeding](database-seeding.md)

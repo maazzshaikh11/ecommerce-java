@@ -1,17 +1,18 @@
 # Architecture Decision Records (ADRs)
 
-This directory contains Architecture Decision Records (ADRs) for the eCommerce migration project.
+This directory contains Architecture Decision Records (ADRs) for the eCommerce project.
 
 ## Index
 
 | ADR | Title | Status |
 |-----|-------|--------|
 | [ADR-001](001-monorepo-structure.md) | Monorepo Structure | Accepted |
-| [ADR-002](002-yarp-reverse-proxy.md) | YARP Reverse Proxy for Ingress | Accepted |
-| [ADR-003](003-adonet-direct-sql.md) | ADO.NET Direct SQL over ORM | Accepted |
+| [ADR-002](002-yarp-reverse-proxy.md) | YARP Reverse Proxy for Ingress | Historical |
+| [ADR-003](003-adonet-direct-sql.md) | ADO.NET Direct SQL over ORM | Historical |
 | [ADR-004](004-jwt-auth-bridge.md) | JWT Authentication Bridge (Option A) | Superseded |
-| [ADR-005](005-vertical-slice-migration.md) | Vertical Slice Migration Order | Accepted |
+| [ADR-005](005-vertical-slice-migration.md) | Vertical Slice Migration Order | Historical |
 | [ADR-006](006-native-api-auth.md) | Native API Authentication (replaces bridge) | Accepted |
+| [ADR-007](007-adopt-spring-boot-backend.md) | Adopt Spring Boot as Primary Backend | Accepted |
 | [Model Assignment](model-assignment.md) | Three-model execution system | Reference |
 
 ## What is an ADR?

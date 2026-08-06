@@ -1,0 +1,47 @@
+server:
+  port: 5001
+
+spring:
+  application:
+    name: ecommerce-api
+
+  profiles:
+    default: dev
+
+  jackson:
+    property-naming-strategy: LOWER_CAMEL_CASE
+    default-property-inclusion: non_null
+
+  datasource:
+    url: jdbc:sqlserver://localhost;databaseName=LegacyEcommerceDb;encrypt=true;trustServerCertificate=true;user=sa;password=YourStrong@Passw0rd
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+    defer-datasource-initialization: false
+
+  sql:
+    init:
+      mode: never
+
+  flyway:
+    enabled: false
+
+jwt:
+  signing-key: bXlzZWNyZXRrZXltdXN0YmVleGFjdGx5MzJieXRlc2xvbmc=
+
+cors:
+  allowed-origins: http://localhost:5173,http://localhost:5174
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG

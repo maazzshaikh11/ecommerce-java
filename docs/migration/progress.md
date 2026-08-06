@@ -49,22 +49,27 @@
 
 ## Architecture Summary
 
-- **API:** ASP.NET Core 10 on port 5001
+- **API (Active):** Java 21 + Spring Boot 3.3 on port 5001
+- **API (Legacy):** ASP.NET Core 10 on port 5001
 - **SPA:** Vue 3 + Vite on port 5002 (preview)
-- **YARP:** Reverse proxy on port 5003, routes all paths to SPA cluster
-- **Auth:** JWT Bearer tokens, `customer_id` claim
-- **Data:** ADO.NET with `Microsoft.Data.SqlClient`, `DatabaseHelper`
+- **YARP:** Reverse proxy on port 5003 (legacy)
+- **Auth:** JWT Bearer tokens, `customer_id` claim (identical in both backends)
+- **Data:** JPA + `NamedParameterJdbcTemplate` (Java) / ADO.NET with `Microsoft.Data.SqlClient` (.NET)
 - **Patterns:** Repository + Service + Controller, DTOs, Pinia stores
 
-## Files of Note
+## Java Migration Deliverables
 
-- `src/backend/Ecommerce.Api/Program.cs` — DI, auth, YARP
-- `src/backend/Ecommerce.Api/Controllers/` — Products, Categories, Cart, Checkout, Orders, Auth
-- `src/backend/Ecommerce.Api.Core/` — Models, DTOs, Interfaces, Security
-- `src/backend/Ecommerce.Api.Data/Repositories/` — ADO.NET repositories
-- `src/backend/Ecommerce.Api.Services/Implementations/` — Business logic
-- `src/frontend/spa/src/` — Vue 3 SPA with router, stores, views, components
-- `tests/e2e/` — Playwright specs
+| Artifact | Status | Location |
+|----------|--------|----------|
+| Spring Boot project | Complete | `src/backend-java/` |
+| 9 JPA entities | Complete | `com.ecommerce.domain` |
+| 5 services + interfaces | Complete | `com.ecommerce.service` |
+| 8 controllers | Complete | `com.ecommerce.controller` |
+| JWT security layer | Complete | `com.ecommerce.security` |
+| 28 passing tests | Complete | `src/test/java/` |
+| Dockerfile | Complete | `src/backend-java/Dockerfile` |
+| CI workflow (Java) | Complete | `.github/workflows/ci.yml` |
+| OpenAPI docs | Complete | `/v3/api-docs` (springdoc) |
 
 ## Pending Human Review
 

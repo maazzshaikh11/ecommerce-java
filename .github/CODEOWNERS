@@ -4,26 +4,15 @@
 
 # Backend
 /src/backend/           @ecommerce/backend
-/src/backend/Ecommerce.Api.Core/Security/  @ecommerce/security
+/src/backend/src/main/java/com/ecommerce/security/  @ecommerce/security
 
 # Frontend
 /src/frontend/          @ecommerce/frontend
 
-# Database & migrations
-/src/backend/Ecommerce.Api.Data/   @ecommerce/backend
-/src/backend/Ecommerce.Api.Migrations/  @ecommerce/backend
-/scripts/               @ecommerce/devops
-
 # Infrastructure
-/infra/                 @ecommerce/devops
 /docker/                @ecommerce/devops
 /.github/workflows/     @ecommerce/devops
 
 # Documentation
 /docs/                  @ecommerce/maintainers
 /docs/decisions/        @ecommerce/architects
-
-# Configuration
-/Directory.Build.props  @ecommerce/architects
-/Directory.Packages.props @ecommerce/architects
-/global.json             @ecommerce/architects

@@ -1,16 +1,14 @@
-# RAW.FORM — eCommerce Migration
+# RAW.FORM — eCommerce
 
-> Modernization of a legacy ASP.NET MVC 5 eCommerce application to a decoupled **Vue 3 + .NET 10 Web API** stack using the **Strangler Fig Pattern**.
+> A full-stack eCommerce application built with **Java 21 + Spring Boot 3.3** and **Vue 3**.
 
 ## Overview
 
-This repository contains the complete modernized eCommerce application — a full-stack monorepo with a stateless .NET 10 backend, a Vue 3 SPA frontend, and a YARP reverse proxy. The legacy ASP.NET MVC 5 application has been successfully modernized into a Vue 3 + .NET 10 architecture using the Strangler Fig migration pattern while preserving feature parity; all traffic now routes to the modern stack.
-
-The migration was executed across 10 phases (125 tasks) using the Strangler Fig pattern: vertical slice by vertical slice, running old and new systems side-by-side until the legacy app could be safely removed.
+RAW.FORM is a production-ready eCommerce platform with a stateless Spring Boot backend, a Vue 3 SPA frontend, and SQL Server storage. It provides product catalog browsing, cart management, JWT-authenticated checkout, and order management.
 
 ## Features
 
-- **Authentication** — JWT Bearer (HS256), native login/register, token persistence, expiry handling
+- **Authentication** — JWT Bearer (HS256), login/register, token persistence, expiry handling
 - **Product Catalog** — Browse, search, filter, sort, paginate, hierarchical category tree
 - **Product Detail** — Image gallery with thumbnails, variant selector, stock display, price adjustment
 - **Shopping Cart** — Add, remove, update quantity, persistent per-customer cart, auth-gated
@@ -26,94 +24,125 @@ The migration was executed across 10 phases (125 tasks) using the Strangler Fig 
 ```mermaid
 graph TB
     Client[Client Browser]
-    YARP[YARP Reverse Proxy ]
-    API[.NET 10 Web API ]
-    SPA[Vue 3 SPA ]
+    API[Spring Boot API]
+    SPA[Vue 3 SPA]
     DB[(SQL Server\nLegacyEcommerceDb)]
 
-    Client --> YARP
-    YARP -->|/api/*| API
-    YARP -->|/*| SPA
+    Client -->|/api/*| API
+    Client -->|/*| SPA
     API --> DB
     SPA -->|fetch + JWT| API
 ```
 
-### Layered Backend
+### Backend — Java 21 + Spring Boot 3.3
 
 ```
 src/backend/
-├── Ecommerce.Api/          ← Controllers, DI, YARP, middleware
-├── Ecommerce.Api.Core/     ← Models, DTOs, Interfaces, Security
-├── Ecommerce.Api.Services/ ← Business logic implementations
-└── Ecommerce.Api.Data/     ← ADO.NET repositories, DatabaseHelper
+├── src/main/java/com/ecommerce/
+│   ├── controller/         ← REST controllers (products, cart, auth, orders, checkout)
+│   ├── service/             ← Business logic (ProductService, CartService, OrderService, etc.)
+│   ├── repository/          ← Spring Data JPA + JdbcTemplate custom queries
+│   ├── domain/              ← JPA entities (Customer, Product, Order, etc.)
+│   ├── dto/                 ← Request/response records
+│   ├── security/            ← JWT generation, validation, JwtAuthFilter
+│   └── config/              ← SecurityConfig, DataSeeder (test only)
+├── src/main/resources/
+│   ├── application.yml      ← SQL Server default config
+│   ├── application-dev.yml  ← Dev profile (SQL Server, SQL logging)
+│   ├── application-test.yml ← Test profile (H2 in-memory, seed data)
+│   ├── application-prod.yml ← Prod profile (SQL Server + Flyway)
+│   └── db/migration/        ← Flyway baseline schema
+├── src/test/java/           ← JUnit 5 + MockMvc + Mockito tests
+├── Dockerfile
+└── pom.xml
 ```
 
 ### Technology Stack
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
-| Backend | .NET 10 Web API | SDK 10.0.302 |
+| Backend | Java 21 + Spring Boot | 3.3.x |
 | Frontend | Vue.js 3 (Composition API) | 3.5.x |
 | Build (FE) | Vite | 8.x |
 | State (FE) | Pinia | 4.x |
 | Router (FE) | Vue Router | 5.x |
-| Gateway | YARP Reverse Proxy | 2.3.0 |
-| Database | SQL Server (LocalDB) | — |
-| Data Access | ADO.NET (Microsoft.Data.SqlClient) | 5.2.2 |
+| Database | SQL Server | 2022+ |
+| Data Access | Spring Data JPA + JdbcTemplate | — |
 | Auth | JWT Bearer (HS256) | — |
-| Testing (BE) | xUnit + Moq | — |
+| Testing (BE) | JUnit 5 + MockMvc + Mockito | — |
 | Testing (FE) | Vitest + Vue Test Utils | — |
 | Testing (E2E) | Playwright | — |
+| API Docs | OpenAPI (springdoc) | 2.6.x |
 
 ## Folder Structure
 
 ```
-ecommerce-migration/
+ecommerce/
 ├── .github/              ← CI/CD workflows, PR templates, dependabot
-├── config/               ← Shared configs (editorconfig, stylecop)
+├── docker/               ← Docker Compose stack
+│   └── compose/
+│       └── docker-compose.yml
 ├── docs/                 ← All project documentation
 │   ├── api/              ← Endpoint catalog, OpenAPI spec
 │   ├── architecture/     ← Architecture, data flow, auth, deployment
 │   ├── decisions/        ← Architecture Decision Records (ADRs)
-│   ├── migration/        ← Task lists, roadmaps, reports, progress
-│   ├── reference/        ← Legacy notes, prompt library
+│   ├── migration/         ← Historical migration documentation
+│   ├── reference/        ← Legacy codebase notes, prompt library
 │   └── runbooks/         ← Setup, seeding, incident, rollback guides
 ├── src/
-│   ├── backend/          ← .NET 10 solution (API, Core, Services, Data, Tests)
-│   ├── frontend/         ← Vue 3 SPA (Vite + Pinia + Vue Router)
-│   ├── gateway/          ← YARP gateway (placeholder)
-│   ├── migration/        ← DB migration tool (placeholder)
-│   └── shared/           ← Shared contracts (placeholder)
-├── tests/                ← E2E (Playwright), integration, load, contract tests
-├── Directory.Build.props ← Shared MSBuild properties
-├── Directory.Packages.props ← Central package version management
-├── Ecommerce.sln         ← .NET solution file
-├── global.json           ← .NET SDK version
-└── Makefile             ← Common commands
+│   ├── backend/          ← Java 21 + Spring Boot 3.3 backend
+│   └── frontend/         ← Vue 3 SPA (Vite + Pinia + Vue Router)
+├── tests/                ← E2E tests (Playwright)
+└── Makefile              ← Common commands
 ```
 
 ## Prerequisites
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| [.NET SDK](https://dotnet.microsoft.com/download) | 10.0.302+ | Backend API, tests |
+| [JDK](https://adoptium.net/) | 21+ | Spring Boot backend, tests |
+| [Maven](https://maven.apache.org/) | 3.9+ | Java build, dependency resolution |
 | [Node.js](https://nodejs.org/) | 22+ | Frontend SPA, E2E tests |
 | [npm](https://www.npmjs.com/) | 10+ | Package management |
-| [SQL Server ](https://learn.microsoft.com/sql/database-engine/configure-windows/sql-server-express-localdb) | — | Database |
+| [Docker](https://www.docker.com/) | — | SQL Server, containerized deployment |
 | [Git](https://git-scm.com/) | 2.x | Version control |
 
 ## Local Setup
 
-### Backend
+### Database (SQL Server via Docker)
+
+```bash
+docker run -d --name sqlserver \
+  -e "ACCEPT_EULA=Y" \
+  -e "MSSQL_SA_PASSWORD=YourStrong@Passw0rd" \
+  -p 1433:1433 \
+  mcr.microsoft.com/mssql/server:2022-latest
+```
+
+Create the database and schema (run once):
+
+```bash
+# Connect and run the baseline migration script
+docker exec -i sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -C \
+  -d master -Q "CREATE DATABASE LegacyEcommerceDb"
+
+docker exec -i sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -C \
+  -d LegacyEcommerceDb -i src/backend/src/main/resources/db/migration/V1__baseline.sql
+```
+
+### Backend (Spring Boot)
 
 ```bash
 cd src/backend
 
-# Restore packages
-dotnet restore Ecommerce.sln
+# Build + test
+mvn clean package -B
 
-# Run the API 
-dotnet run --project Ecommerce.Api/Ecommerce.Api.csproj
+# Run the API (connects to SQL Server on localhost:1433)
+mvn spring-boot:run
+
+# API available at http://localhost:5001
+# Swagger UI at http://localhost:5001/swagger-ui.html
 ```
 
 ### Frontend
@@ -124,67 +153,41 @@ cd src/frontend/spa
 # Install dependencies
 npm install
 
-# Start dev server 
+# Start dev server (Vite, port 5174 by default)
 npm run dev
 ```
-
-### Database
-
-The application uses SQL Server  with a `LegacyEcommerceDb` database.
-
-```bash
-# Setup database (creates + seeds)
-./scripts/setup.sh          # Linux/macOS
-.\scripts\setup.ps1          # Windows
-```
-
-Connection string (in `src/backend/Ecommerce.Api/appsettings.json`):
-```
-Server=(localdb)\MSSQLLocalDB;Database=LegacyEcommerceDb;Trusted_Connection=True;TrustServerCertificate=True;
-```
-
-See [Local Setup Runbook](docs/runbooks/local-setup.md) for detailed instructions.
 
 ## Running the Application
 
 ```bash
-# Terminal 1: Backend API 
+# Terminal 1: Backend API
 cd src/backend
-dotnet run --project Ecommerce.Api/Ecommerce.Api.csproj
+mvn spring-boot:run
 
-# Terminal 2: Frontend SPA 
+# Terminal 2: Frontend SPA
 cd src/frontend/spa
 npm run dev
 ```
 
-After starting both services, open the application in your browser.
-> YARP reverse proxy runs as part of the API process and routes SPA paths.
-
 ## Running Tests
 
-### Backend Tests (xUnit)
+### Backend Tests (JUnit 5)
 
 ```bash
 cd src/backend
 
-# Run all tests
-dotnet test Ecommerce.sln
+# Run all tests (uses H2 in-memory DB with seed data)
+mvn test -B
 
-# Or run specific test projects
-dotnet test Ecommerce.Api.Tests/Ecommerce.Api.Tests.csproj
-dotnet test Ecommerce.Api.Core.Tests/Ecommerce.Api.Core.Tests.csproj
+# Run a specific test class
+mvn test -Dtest=JwtTokenServiceTest
 ```
 
 ### Frontend Tests (Vitest)
 
 ```bash
 cd src/frontend/spa
-
-# Run unit tests
 npx vitest run
-
-# Run in watch mode
-npx vitest
 ```
 
 ### E2E Tests (Playwright)
@@ -195,69 +198,43 @@ npm install
 npx playwright test
 ```
 
-## Build Commands
-
-### Backend
+## Docker
 
 ```bash
-cd src/backend
+# Build and run the full stack (API + SPA + SQL Server)
+docker compose -f docker/compose/docker-compose.yml up -d
 
-# Build entire solution
-dotnet build Ecommerce.sln
-
-# Build API only
-dotnet build Ecommerce.Api/Ecommerce.Api.csproj
+# Stop
+docker compose -f docker/compose/docker-compose.yml down
 ```
 
-### Frontend
+## Makefile Shortcuts
 
 ```bash
-cd src/frontend/spa
-
-# Production build (includes type check via vue-tsc)
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-### Makefile Shortcuts
-
-```bash
-make build     # Build backend + frontend
-make test      # Run all tests
-make lint      # Lint everything
-make docker-up # Start all services via Docker
+make build         # Build backend + frontend
+make test          # Run backend + frontend tests
+make test-e2e      # Run Playwright E2E tests
+make lint          # Type check frontend
+make docker-up     # Start all services via Docker Compose
+make verify        # Full CI verification (builds + tests)
+make clean         # Remove build artifacts
 ```
 
 ## Architecture Overview
 
 The application follows a **layered architecture** with clear separation of concerns:
 
-- **Controllers** (`Ecommerce.Api/Controllers/`) — HTTP endpoints, model validation, JWT claim extraction
-- **Services** (`Ecommerce.Api.Services/`) — Business logic, orchestration, validation
-- **Repositories** (`Ecommerce.Api.Data/`) — ADO.NET data access via `DatabaseHelper`
-- **Models/DTOs** (`Ecommerce.Api.Core/`) — Domain entities, data transfer objects, interfaces
-- **Security** (`Ecommerce.Api.Core/Security/`) — JWT token generation and validation
+### Spring Boot Backend
+
+- **Controllers** (`com.ecommerce.controller/`) — HTTP endpoints, model validation, JWT claim extraction
+- **Services** (`com.ecommerce.service/`) — Business logic, orchestration, validation
+- **Repositories** (`com.ecommerce.repository/`) — Spring Data JPA + `NamedParameterJdbcTemplate` for custom queries
+- **Domain** (`com.ecommerce.domain/`) — JPA entities (`Customer`, `Product`, `Order`, etc.)
+- **DTOs** (`com.ecommerce.dto/`) — Request/response records
+- **Security** (`com.ecommerce.security/`) — JWT token generation, validation, `JwtAuthFilter`
+- **Config** (`com.ecommerce.config/`) — `SecurityConfig`, `DataSeeder` (test profile only)
 
 The SPA uses **Pinia stores** for state management, **Vue Router** for navigation, and a shared **`fetch` wrapper** (`api/client.ts`) that handles JWT attachment and error propagation.
-
-## Migration Strategy (Strangler Fig)
-
-The migration followed the **Strangler Fig Pattern**:
-
-1. **Phase 1** — Infrastructure (YARP, solution, DB connectivity)
-2. **Phase 2** — Authentication (JWT, login/register)
-3. **Phase 3** — Product Catalog (browse, search, detail)
-4. **Phase 4** — Category Navigation (tree, filter)
-5. **Phase 5** — Shopping Cart (add, remove, update)
-6. **Phase 6** — Checkout (address, shipping, payment, order)
-7. **Phase 7** — Order History (list, detail)
-8. **Phase 8** — Home / Landing (featured products)
-9. **Phase 9** — Full E2E regression
-10. **Phase 10** — Decommission legacy (all traffic → SPA)
-
-See [Migration Documentation](docs/migration/README.md) for the complete task list, roadmap, and progress.
 
 ## Documentation
 
@@ -268,23 +245,14 @@ All documentation lives under [`docs/`](docs/). See the [Documentation Index](do
 | Category | Document | Description |
 |----------|----------|-------------|
 | Architecture | [Architecture Overview](docs/architecture/README.md) | Topology, tech stack, request lifecycle |
-| Architecture | [Target State](docs/architecture/target-state.md) | Modern architecture design |
-| Architecture | [Auth Strategy](docs/architecture/auth-strategy.md) | JWT authentication flow |
-| Architecture | [Data Flow](docs/architecture/data-flow.md) | Request lifecycle diagrams |
-| Architecture | [Deployment Model](docs/architecture/deployment-model.md) | Containers, CI/CD, infra |
 | Decisions | [ADR Index](docs/decisions/README.md) | Architecture decision records |
-| Migration | [Master Task List](docs/migration/master-task-list.md) | T-001 → T-125 task breakdown |
-| Migration | [Progress](docs/migration/progress.md) | Final status and deviations |
-| Migration | [Feature Parity Report](docs/migration/feature-parity-report.md) | Legacy vs modern audit |
 | API | [Endpoint Catalog](docs/api/endpoint-catalog.md) | All REST endpoints |
 | API | [OpenAPI Spec](docs/api/openapi.yaml) | Machine-readable spec |
+| Runbooks | [Spring Setup](docs/runbooks/spring-setup.md) | Backend setup guide |
 | Runbooks | [Local Setup](docs/runbooks/local-setup.md) | Environment setup guide |
 | Runbooks | [Incident Response](docs/runbooks/incident-response.md) | Production incident guide |
-| Reference | [Legacy Codebase Notes](docs/reference/legacy-codebase-notes.md) | Migration mappings, gotchas |
-
+| Reference | [Legacy Codebase Notes](docs/reference/legacy-codebase-notes.md) | Historical migration notes |
 
 ## License
-
-<!-- Add license information here -->
 
 See [LICENSE](LICENSE).

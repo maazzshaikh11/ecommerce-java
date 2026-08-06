@@ -1,223 +1,104 @@
 # ──────────────────────────────────────────────────────────────
-# .gitignore — eCommerce Migration Monorepo
-# .NET, Node.js, Docker, IDEs, OS files
+# .gitignore — eCommerce project
+# Java/Maven, Node.js, Docker, IDEs, OS files
 # ──────────────────────────────────────────────────────────────
 
-# ─── .NET ───────────────────────────────────────────────────
-## Build output
-bin/
-obj/
-[Bb]uild/
-[Bb]uilds/
-[Bb]inaries/
+# ─── Java / Maven ───────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.mvn/wrapper/maven-wrapper.jar
 
-## NuGet
-*.nupkg
-*.snupkg
-.nuget/
-packages/
-!**/packages/build/
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
-## Visual Studio
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-*.vs/
-*.vspscc
-*.vssscc
-.vscode/
-# Allow .vscode only if it contains shared configs (keep specific files)
-!src/frontend/spa/.vscode/
-
-## Build logs
-*.log
-msbuild.log
-msbuild.wrn
-msbuild.err
-
-## Test results
-[Tt]est[Rr]esult*/
-[Bb]uild[Ll]og.*
-TestResults/
-*.coverage
-*.coveragexml
-coverage/
-*.trx
-
-## Temporary files
-*.tmp
-*.tmp_proj
-*.cache
-*.tlog
-
-# ─── Node.js ────────────────────────────────────────────────
-## Dependencies
+# ─── Node.js ─────────────────────────────────────────────────
 node_modules/
 **/node_modules/
-
-## Build output
 dist/
 build/
 .output/
 .vite/
-
-## npm
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .npm
 .pnpm-store/
+*.tsbuildinfo
 
-## Lock files (keep package-lock.json; ignore others if not primary)
-# Keep: package-lock.json
-
-## Environment files (never commit secrets)
+# ─── Environment files (never commit secrets) ───────────────
 .env
 .env.local
 .env.*.local
-# Allow example env files
+secrets.json
 !.env.example
 !.env.development
 
-## Test output
+# ─── Test output ─────────────────────────────────────────────
 test-results/
 .nyc_output/
 *.lcov
-
-## Coverage
 coverage/
-*.lcov
-
-# ─── Vite ───────────────────────────────────────────────────
-.vite/
-.vite-ssr-temp/
-stats.html
-
-# ─── Playwright ────────────────────────────────────────────
 playwright-report/
 playwright/.cache/
 test-results/.last-run.json
 blob-report/
 
-# ─── TypeScript ─────────────────────────────────────────────
-*.tsbuildinfo
-
-# ─── Docker ────────────────────────────────────────────────
+# ─── Docker ──────────────────────────────────────────────────
 docker-compose.override.*.yml
-# Allow committed compose files
 !docker/compose/docker-compose.yml
 !docker/compose/docker-compose.override.yml
-!docker/compose/docker-compose.infra.yml
-!docker/compose/docker-compose.test.yml
-
-# ─── IDE: Visual Studio ─────────────────────────────────────
-*.suo
-*.user
-*.userprefs
-*.vs/
-*.vspx
-*.lockhost
-*.cache
 
 # ─── IDE: VS Code ───────────────────────────────────────────
 .vscode/*
-# Allow shared .vscode configs
 !src/frontend/spa/.vscode/
 !src/frontend/spa/.vscode/extensions.json
 !src/frontend/spa/.vscode/settings.json
 
-# ─── IDE: JetBrains (Rider, WebStorm) ──────────────────────
+# ─── IDE: JetBrains (IntelliJ, WebStorm) ─────────────────────
 .idea/
 *.iml
 *.ipr
 *.iws
 
-# ─── IDE: Sublime Text ──────────────────────────────────────
-*.sublime-workspace
-*.sublime-project
-
-# ─── OS: Windows ────────────────────────────────────────────
+# ─── OS: Windows ─────────────────────────────────────────────
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 *.lnk
 
-# ─── OS: macOS ─────────────────────────────────────────────
+# ─── OS: macOS ───────────────────────────────────────────────
 .DS_Store
 .AppleDouble
 .LSOverride
 Icon?
 ._*
 
-# ─── OS: Linux ──────────────────────────────────────────────
+# ─── OS: Linux ────────────────────────────────────────────────
 *~
 .directory
 .Trash-*
 
-# ─── Logs ───────────────────────────────────────────────────
+# ─── Logs ────────────────────────────────────────────────────
 logs/
 *.log
 *.pid
 *.seed
 *.pid.lock
 
-# ─── Temporary files ───────────────────────────────────────
+# ─── Temporary files ─────────────────────────────────────────
 tmp/
 temp/
 *.bak
 *.swp
 *.swo
-*~
 
-# ─── Secrets / Environment ─────────────────────────────────
-.env
-.env.local
-.env.*.local
-secrets.json
-appsettings.*.Development.json
-appsettings.*.Production.json
-# Allow committed development configs
-!src/backend/Ecommerce.Api/appsettings.json
-!src/backend/Ecommerce.Api/appsettings.Development.json
-
-# ─── NuGet config (keep if committed) ──────────────────────
-# nuget.config
-
-# ─── Do NOT ignore ─────────────────────────────────────────
-# Keep these even if they match patterns above
-!.github/
-!.github/**/*
-!docs/
-!docs/**/*
-!config/
-!config/**/*
-!docker/
-!docker/**/*
-!infra/
-!infra/**/*
-!scripts/
-!scripts/**/*
-!tools/
-!tools/**/*
-!tests/
-!tests/e2e/playwright.config.ts
-!tests/e2e/package.json
-!tests/e2e/specs/**/*
-!tests/e2e/fixtures/**/*
-!tests/e2e/pages/**/*
-!tests/integration/**/*
-!tests/contracts/**/*
-!tests/load/**/*
-
-# ─── Build artifacts that should always be ignored ────────
-src/backend/**/bin/
-src/backend/**/obj/
+# ─── Build artifacts ─────────────────────────────────────────
+src/backend/target/
 src/frontend/spa/dist/
 src/frontend/spa/node_modules/
 src/frontend/spa/.vite/
@@ -226,8 +107,5 @@ tests/e2e/node_modules/
 tests/e2e/test-results/
 tests/e2e/playwright-report/
 
-####################################################
-# Generated Documentation
-####################################################
-
+# ─── Generated Documentation ──────────────────────────────────
 *.generated.md

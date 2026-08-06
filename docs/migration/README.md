@@ -1,6 +1,8 @@
-# Migration
+# Migration (Historical Archive)
 
-This directory contains all documentation related to the migration from the legacy ASP.NET MVC 5 application to the modern Vue 3 + .NET 10 Web API stack.
+> **Note:** This directory is a read-only historical archive documenting the migration from the legacy ASP.NET MVC 5 application to the modern stack. The migration is complete. The backend is now Java 21 + Spring Boot 3.3 (`src/backend/`). These documents are preserved for reference only.
+
+This directory contains all documentation related to the migration from the legacy ASP.NET MVC 5 application to the modern Vue 3 + Spring Boot stack.
 
 ## Documents
 

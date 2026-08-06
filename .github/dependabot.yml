@@ -1,7 +1,7 @@
 version: 2
 updates:
-  # .NET NuGet packages
-  - package-ecosystem: "nuget"
+  # Maven packages — Spring Boot backend
+  - package-ecosystem: "maven"
     directory: "/src/backend"
     schedule:
       interval: "weekly"
@@ -10,11 +10,6 @@ updates:
     labels:
       - "dependencies"
       - "backend"
-    groups:
-      microsoft:
-        patterns:
-          - "Microsoft.*"
-          - "System.*"
 
   # npm packages — Frontend SPA
   - package-ecosystem: "npm"

@@ -1,1 +1,0 @@
-# YARP Gateway project
