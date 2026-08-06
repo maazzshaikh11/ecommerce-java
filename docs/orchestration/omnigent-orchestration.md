@@ -573,3 +573,25 @@ This orchestration document is the **routing layer**. It does not redefine any p
 | Progress tracking format | `11-progress-tracking.md` |
 
 For the concrete case study with metrics, timeline, and challenges, see `docs/process/99-case-study-dotnet-java.md`.
+
+---
+
+## AI Model Usage During the POC
+
+### Models Used
+
+| Model | Primary Usage |
+|-------|---------------|
+| **Kimi-K2.6** | Repository analysis, implementation, debugging, testing, verification, and documentation |
+| **GLM-5.2** | Planning, architecture reasoning, implementation planning, and task decomposition |
+| **Kimi-K2.7-Code** | Code-focused assistance for smaller implementation tasks |
+
+### AI Model Usage Statistics
+
+<p align="center">
+  <img src="docs/images/model-usage.png" alt="AI Model Usage Statistics" width="900"/>
+</p>
+
+<p align="center">
+<b>Figure X.</b> Model usage statistics captured during the POC, showing the primary AI models used throughout planning, implementation, and verification.
+</p>
