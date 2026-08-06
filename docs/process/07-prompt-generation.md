@@ -19,25 +19,17 @@
 
 ## Prompt Structure
 
-```mermaid
-block-beta
-    columns 1
-    block:pre["SHARED PREAMBLE (same for all tasks)"]
-        A["Project context ('migrating .NET → Spring Boot')"]
-        B["Planning docs to read first (by path)"]
-        C["Hard parity rules (never violate)"]
-        D["Coding conventions (Java 21 records, no comments)"]
-        E["'When done' report format"]
-    end
-    --> arrow[""]
-    block:task["TASK-SPECIFIC SECTION (unique per task)"]
-        F["Task ID and name"]
-        G["Objective"]
-        H["Source files to read (by path)"]
-        I["Output files to produce (by path)"]
-        J["Acceptance criteria"]
-        K["Build/test commands to run"]
-    end
+```text
++-------------------------------------------+     +-------------------------------------------+
+|              SHARED PREAMBLE              | --> |          TASK-SPECIFIC SECTION            |
+|-------------------------------------------|     |-------------------------------------------|
+| • Project context (.NET → Spring Boot)    |     | • Task ID and name                       |
+| • Planning docs to read first             |     | • Objective                              |
+| • Hard parity rules (never violate)       |     | • Source files to read                   |
+| • Coding conventions (Java 21, no comments)|    | • Output files to produce                |
+| • "When done" report format               |     | • Acceptance criteria                    |
+|                                           |     | • Build/Test commands                    |
++-------------------------------------------+     +-------------------------------------------+
 ```
 
 > **Note:** Each prompt = shared preamble + one task-specific section. The preamble is identical for every task; only the task section changes.
