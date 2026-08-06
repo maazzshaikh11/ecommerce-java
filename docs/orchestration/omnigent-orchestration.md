@@ -589,7 +589,7 @@ For the concrete case study with metrics, timeline, and challenges, see `docs/pr
 ### AI Model Usage Statistics
 
 <p align="center">
-  <img src="docs/images/model-usage.png" alt="AI Model Usage Statistics" width="900"/>
+  <img src="../images/model-usage.png" alt="AI Model Usage Statistics" width="900">
 </p>
 
 <p align="center">
