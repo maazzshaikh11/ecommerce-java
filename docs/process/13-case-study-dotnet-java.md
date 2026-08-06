@@ -13,17 +13,17 @@ Modernized a legacy ASP.NET MVC 5 eCommerce application into a Java 21 + Spring 
 ## Timeline
 
 ```
-Wave 1: Legacy MVC 5 → .NET 10 API + Vue  SPA          Aug 5, 11:50 – 14:22
-  Initial commit                                        11:50
-  .NET solution, YARP, controllers, services             12:00 – 13:00
-  Vue SPA, components, stores, routing                   13:00 – 13:28
-  Repository cleanup (infra, scripts, docker removed)    13:28 – 14:22
+Wave 1: Legacy MVC 5 → .NET 10 API + Vue  SPA          
+  Initial commit                                        
+  .NET solution, YARP, controllers, services             
+  Vue SPA, components, stores, routing                  
+  Repository cleanup (infra, scripts, docker removed)    
 
-Wave 2: .NET 10 → Java 21 + Spring Boot 3.3              Aug 6, 09:46 – 12:58
-  Planning artifacts (10 docs)                           09:46 – 10:30
-  SB-01 through SB-09 (implementation)                   10:30 – 12:30
-  SQL Server integration + parity fixes                  12:30 – 12:46
-  Repository cleanup (.NET removed, renamed to backend)  12:46 – 12:58
+Wave 2: .NET 10 → Java 21 + Spring Boot 3.3              
+  Planning artifacts (10 docs)                          
+  SB-01 through SB-09 (implementation)                   
+  SQL Server integration + parity fixes                  
+  Repository cleanup (.NET removed, renamed to backend)  
 ```
 
 ```mermaid
@@ -51,21 +51,16 @@ gantt
 
 | Metric | Value |
 |--------|-------|
-| Total wall-clock time | ~1 working day |
 | Git commits | 20 |
 | Planning artifacts produced | 10 documents (1,417 lines) |
 | Architecture Decision Records | 7 |
 | Architecture documents | 8 |
-| Total documentation | 15,765 lines across 40+ files |
 | Java source files | 66 |
-| Java source lines | 2,561 |
 | Java test files | 5 |
-| Java test lines | 368 |
 | Java tests passing | 28/28 (0 failures, 0 errors, 0 skipped) |
 | Vue components | 23 |
 | Vue views | 12 |
 | Vue stores | 7 |
-| Vue source lines | 2,315 |
 | Frontend unit tests | 7 spec files |
 | E2E test specs | 5 (Playwright) |
 | JPA entities | 9 |
