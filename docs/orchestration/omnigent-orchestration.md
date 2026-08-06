@@ -468,120 +468,90 @@ The diagram below shows the full flow from user requirement to final delivery, i
 ```mermaid
 sequenceDiagram
     autonumber
+
     participant U as User
     participant O as Omnigent
-    participant RA as Requirement Agent
-    participant RAA as Repository Analysis Agent
-    participant AA as Architecture Agent
-    participant PA as Planning Agent
-    participant TBA as Task Breakdown Agent
-    participant PGA as Prompt Generation Agent
-    participant IA as Implementation Agent
-    participant VA as Verification Agent
-    participant DA as Documentation Agent
+    participant A as AI Agents
+    participant V as Verification
     participant H as Human
 
-    U->>O: "Modernize system X"
+    U->>O: Submit modernization request
 
-    rect rgb(240, 248, 255)
-        Note over O,AA: PHASE 0 — DISCOVERY
+    Note over O,A: PHASE 0 - DISCOVERY
 
-        O->>RA: Load 01-requirement-understanding.md + source repo
-        RA->>RA: Read source, catalog behaviors + parity traps
-        RA-->>O: Repository Understanding Doc
+    O->>A: Requirement Understanding
+    A-->>O: Repository Understanding
 
-        O->>RAA: Load 02-repository-analysis.md + Understanding Doc
-        RAA->>RAA: Layered analysis, reverse-engineer schema
-        RAA-->>O: Layer catalogs + Flyway baseline script
+    O->>A: Repository Analysis
+    A-->>O: Layer Catalogs + Schema
 
-        O->>AA: Load 03-architecture-understanding.md + catalogs
-        AA->>AA: Document current/target state, write ADRs
-        AA-->>O: Architecture docs + ADRs
+    O->>A: Architecture Analysis
+    A-->>O: Architecture Docs + ADRs
 
-        O->>H: Present architecture + ADRs for approval
-        H-->>O: Approved
-    end
+    O->>H: Architecture Approval
+    H-->>O: Approved
 
-    rect rgb(255, 248, 240)
-        Note over O,PGA: PHASE 1 — PLANNING
+    Note over O,A: PHASE 1 - PLANNING
 
-        O->>PA: Load 04-planning.md + architecture docs
-        PA->>PA: Produce 10 planning artifacts
-        PA-->>O: Planning artifacts (phases, gates, verification strategy)
+    O->>A: Generate Planning Artifacts
+    A-->>O: Migration Plan
 
-        O->>TBA: Load 05-task-breakdown.md + planning artifacts
-        TBA->>TBA: Decompose into tasks with stable IDs + dependencies
-        TBA-->>O: Master task list + dependency graph
+    O->>A: Task Breakdown
+    A-->>O: Task Graph
 
-        O->>PGA: Load 07-prompt-generation.md + task list + parity traps
-        PGA->>PGA: Build self-contained prompts (preamble + task section)
-        PGA-->>O: One prompt per task
+    O->>A: Generate Task Prompts
+    A-->>O: One Prompt per Task
 
-        O->>H: Present phase order + task decomposition for approval
-        H-->>O: Approved
-    end
+    O->>H: Planning Approval
+    H-->>O: Approved
 
-    rect rgb(240, 255, 240)
-        Note over O,VA: PHASES 2–N — IMPLEMENTATION (repeated per phase)
+    Note over O,V: PHASE 2 - IMPLEMENTATION
 
-        loop For each task in dependency order
-            O->>IA: Load 08-implementation.md + task prompt + source code
-            IA->>IA: Write code, build, test, fix loop
-            IA-->>O: Code + completion report
+    loop For Each Task
+        O->>A: Execute Task
+        A-->>O: Code + Build Report
 
-            O->>VA: Load 09-build-and-verification.md + build/test results
-            VA->>VA: Run Ring A (per-task verification)
-
-            alt PASS
-                VA-->>O: Gate PASS
-                O->>O: Checkpoint, dispatch next task
-            else FAIL
-                VA-->>O: Gate FAIL + discrepancy log
-                O->>IA: Re-dispatch with error output
-            end
-        end
-
-        O->>VA: Run phase gate (Ring B)
-        alt PASS
-            VA-->>O: Phase gate PASS
-            O->>O: Advance to next phase
-        else FAIL
-            VA-->>O: Phase gate FAIL
-            O->>IA: Re-dispatch failed tasks
-        end
-    end
-
-    rect rgb(255, 240, 245)
-        Note over O,VA: FINAL — PARITY VERIFICATION
-
-        O->>VA: Run Ring C (E2E smoke test against real DB)
-        VA->>VA: Hit every endpoint, verify status + JSON shapes
+        O->>V: Verify Task
 
         alt PASS
-            VA-->>O: Parity verified
+            V-->>O: Task Approved
         else FAIL
-            VA-->>O: Discrepancies found
-            O->>IA: Route discrepancies back to owning tasks
+            V-->>O: Issues Found
+            O->>A: Rework Task
         end
     end
 
-    rect rgb(248, 240, 255)
-        Note over O,DA: DELIVERY — DOCUMENTATION + CLEANUP
+    O->>V: Phase Gate Verification
 
-        O->>DA: Load 10-documentation.md + all artifacts
-        DA->>DA: Update README, runbooks, ADRs; archive migration docs
-        DA-->>O: Updated documentation
-
-        O->>O: Repository cleanup (remove legacy, rename dirs, update CI/Docker)
-
-        O->>VA: Post-cleanup build + test verification
-        VA-->>O: All green
-
-        O->>H: Present final results for sign-off
-        H-->>O: Approved
+    alt PASS
+        V-->>O: Continue
+    else FAIL
+        V-->>O: Rework Required
     end
 
-    O->>U: Delivered — clean repository, all tests pass, docs current
+    Note over O,V: FINAL PARITY CHECK
+
+    O->>V: End-to-End Verification
+
+    alt PASS
+        V-->>O: System Matches Source
+    else FAIL
+        V-->>O: Parity Issues
+        O->>A: Fix Issues
+    end
+
+    Note over O,A: DELIVERY
+
+    O->>A: Update Documentation
+    A-->>O: README + Runbooks
+
+    O->>V: Final Build Verification
+    V-->>O: All Checks Passed
+
+    O->>H: Final Review
+    H-->>O: Approved
+
+    O-->>U: Deliver Completed Project
 ```
 
 ---
